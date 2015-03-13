@@ -54,9 +54,9 @@
     [toolBar addSubview:sendButton];
     
     
-    self.view.keyboardTriggerOffset = toolBar.bounds.size.height;
+    self.keyboardTriggerOffset = toolBar.bounds.size.height;
     
-    [self.view addKeyboardPanningWithFrameBasedActionHandler:^(CGRect keyboardFrameInView, BOOL opening, BOOL closing) {
+    [self addKeyboardPanningWithFrameBasedActionHandler:^(CGRect keyboardFrameInView, BOOL opening, BOOL closing) {
         /*
          Try not to call "self" inside this block (retain cycle).
          But if you do, make sure to remove DAKeyboardControl

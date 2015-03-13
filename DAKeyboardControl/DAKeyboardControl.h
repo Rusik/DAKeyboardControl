@@ -16,7 +16,7 @@ typedef void (^DAKeyboardDidMoveBlock)(CGRect keyboardFrameInView, BOOL opening,
  extends UIView and provides a block callback with the keyboard's current origin.
  */
 
-@interface UIView (DAKeyboardControl)
+@interface UIViewController (DAKeyboardControl)
 
 /** The keyboardTriggerOffset property allows you to choose at what point the
  user's finger "engages" the keyboard.
@@ -56,5 +56,8 @@ typedef void (^DAKeyboardDidMoveBlock)(CGRect keyboardFrameInView, BOOL opening,
 
 /** Convenience method to dismiss the keyboard */
 - (void)hideKeyboard;
+
+/** Start tracking keyboard for view */
+- (void)trackKeyboardForView:(UIView *)view;
 
 @end
