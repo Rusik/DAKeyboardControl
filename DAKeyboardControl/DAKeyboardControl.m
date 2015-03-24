@@ -157,7 +157,8 @@ static char UIViewKeyboardOpened;
                                                   object:nil];
 
     // Unregister any gesture recognizer
-    [self.view removeGestureRecognizer:self.keyboardPanRecognizer];
+    if (self.isViewLoaded)
+        [self.view removeGestureRecognizer:self.keyboardPanRecognizer];
 
     // Release a few properties
     self.frameBasedKeyboardDidMoveBlock = nil;
