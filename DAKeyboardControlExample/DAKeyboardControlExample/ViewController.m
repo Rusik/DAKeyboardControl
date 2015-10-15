@@ -55,7 +55,8 @@
     
     
     self.keyboardTriggerOffset = toolBar.bounds.size.height;
-    
+
+    [self trackKeyboardForView:textField];
     [self addKeyboardPanningWithFrameBasedActionHandler:^(CGRect keyboardFrameInView, BOOL opening, BOOL closing) {
         /*
          Try not to call "self" inside this block (retain cycle).

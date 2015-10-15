@@ -157,8 +157,7 @@ static char UIViewKeyboardOpened;
                                                   object:nil];
 
     // Unregister any gesture recognizer
-    if (self.isViewLoaded)
-        [self.view removeGestureRecognizer:self.keyboardPanRecognizer];
+    [self.view removeGestureRecognizer:self.keyboardPanRecognizer];
 
     // Release a few properties
     self.frameBasedKeyboardDidMoveBlock = nil;
@@ -238,14 +237,14 @@ static char UIViewKeyboardOpened;
 
 - (void)inputKeyboardDidShow {
     // Grab the keyboard view
-    self.keyboardActiveView = self.keyboardActiveInput.inputAccessoryView.superview;
+    self.keyboardActiveView = [self findInputSetHostView];
     self.keyboardActiveView.hidden = NO;
 
     // If the active keyboard view could not be found (UITextViews...), try again
     if (!self.keyboardActiveView) {
         // Find the first responder on subviews and look re-assign first responder to it
         self.keyboardActiveInput = [self recursiveFindFirstResponder:self.view];
-        self.keyboardActiveView = self.keyboardActiveInput.inputAccessoryView.superview;
+        self.keyboardActiveView = [self findInputSetHostView];
         self.keyboardActiveView.hidden = NO;
     }
 }
@@ -369,7 +368,7 @@ static char UIViewKeyboardOpened;
 - (void)panGestureDidChange:(UIPanGestureRecognizer *)gesture {
     if (!self.keyboardActiveView || !self.keyboardActiveInput || self.keyboardActiveView.hidden) {
         self.keyboardActiveInput = [self recursiveFindFirstResponder:self.view];
-        self.keyboardActiveView = self.keyboardActiveInput.inputAccessoryView.superview;
+        self.keyboardActiveView = [self findInputSetHostView];
         self.keyboardActiveView.hidden = NO;
     } else {
         self.keyboardActiveView.hidden = NO;
@@ -515,6 +514,22 @@ static char UIViewKeyboardOpened;
     }
 }
 
+- (UIView *)findInputSetHostView {
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0) {
+        for (UIWindow *window in [[UIApplication sharedApplication] windows])
+            if ([window isKindOfClass:NSClassFromString(@"UIRemoteKeyboardWindow")])
+                for (UIView *subView in window.subviews)
+                    if ([subView isKindOfClass:NSClassFromString(@"UIInputSetHostView")])
+                        for (UIView *subsubView in subView.subviews)
+                            if ([subsubView isKindOfClass:NSClassFromString(@"UIInputSetHostView")])
+                                return subsubView;
+    } else {
+        return self.keyboardActiveInput.inputAccessoryView.superview;
+    }
+
+    return nil;
+}
+
 #pragma mark - Property Methods
 
 - (CGRect)previousKeyboardRect {
@@ -658,9 +673,9 @@ static char UIViewKeyboardOpened;
 
 - (BOOL)keyboardWillRecede {
     CGFloat keyboardViewHeight = self.keyboardActiveView.bounds.size.height;
-    CGFloat keyboardWindowHeight = self.keyboardActiveView.window.bounds.size.height;
+    CGFloat keyboardWindowHeight = self.keyboardActiveView.window.bounds.size.height; //superview
     CGPoint touchLocationInKeyboardWindow = [self.keyboardPanRecognizer locationInView:self.keyboardActiveView.window];
-    
+
     CGFloat thresholdHeight = keyboardWindowHeight - keyboardViewHeight - self.keyboardTriggerOffset + 44.0f;
     CGPoint velocity = [self.keyboardPanRecognizer velocityInView:self.keyboardActiveView];
     
